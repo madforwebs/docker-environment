@@ -1,0 +1,50 @@
+version: '3'
+services:
+    db5:
+        image: mysql:5.7.32
+        command: --default-authentication-plugin=mysql_native_password
+        volumes:
+            - "db5_app:/var/lib/mysql"
+            - ./mysql/conf.d:/etc/mysql/conf.d/my.cnf/
+            - ./bigmamaswing.com/:/var/www/bigmamaswing.com/
+        environment:
+            MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+            MYSQL_DATABASE: ${MYSQL_DATABASE}
+            MYSQL_USER: ${MYSQL_USER}
+            MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+        ports:
+            - 3306:3306
+        networks:
+            bigmamaswing:
+                ipv4_address: 172.22.0.5
+
+    php:
+        build:
+            context: .
+            dockerfile: docker/php/Dockerfile
+            args:
+                TIMEZONE: ${TIMEZONE}
+        volumes:
+            - ./bigmamaswing.com/:/var/www/bigmamaswing.com/
+        networks:
+            - bigmamaswing
+    nginx:
+        build:
+            context: .
+            dockerfile: docker/nginx/Dockerfile
+        volumes:
+            - ./bigmamaswing.com/:/var/www/bigmamaswing.com/
+        ports:
+            - 8001:80
+        networks:
+            - bigmamaswing
+
+volumes:
+    db5_app:
+
+networks:
+    bigmamaswing:
+        driver: bridge
+        ipam:
+            config:
+                - subnet: 172.22.0.0/16
