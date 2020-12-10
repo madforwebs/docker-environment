@@ -6,7 +6,7 @@ services:
         volumes:
             - "db5_app:/var/lib/mysql"
             - ./mysql/conf.d:/etc/mysql/conf.d/my.cnf/
-            - ./bigmamaswing.com/:/var/www/bigmamaswing.com/
+            - ./site/:/var/www/${PROJECT}/
         environment:
             MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
             MYSQL_DATABASE: ${MYSQL_DATABASE}
@@ -25,7 +25,7 @@ services:
             args:
                 TIMEZONE: ${TIMEZONE}
         volumes:
-            - ./bigmamaswing.com/:/var/www/bigmamaswing.com/
+            - ./site/:/var/www/${PROJECT}/
         networks:
             - bigmamaswing
     nginx:
@@ -33,7 +33,7 @@ services:
             context: .
             dockerfile: docker/nginx/Dockerfile
         volumes:
-            - ./bigmamaswing.com/:/var/www/bigmamaswing.com/
+            - ./site/:/var/www/${PROJECT}/
         ports:
             - 8001:80
         networks:
